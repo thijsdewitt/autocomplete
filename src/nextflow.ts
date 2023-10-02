@@ -1,3 +1,18 @@
+const sessionid: Fig.Generator = {
+  script: "cat .nextflow/history | awk '{ print $7 }'",
+  postProcess: (output) => {
+    if (output == "") {
+      return [];
+    }
+    return output.split("\n").map((sessionid) => {
+      return {
+        name: sessionid.replace("*", "").trim(),
+        description: "Session ID",
+      };
+    });
+  },
+};
+
 const runname: Fig.Generator = {
   script: "cat .nextflow/history | awk '{ print $4 }'",
   postProcess: (output) => {
@@ -445,7 +460,7 @@ const completionSpec: Fig.Spec = {
           },
         },
         {
-          name: ["-stub-ru", "-stub"],
+          name: ["-stub-run", "-stub"],
           description:
             "Execute the workflow replacing process scripts with command stubs (Default: false)",
         },
@@ -836,6 +851,11 @@ const completionSpec: Fig.Spec = {
           name: "-resume",
           description:
             "Execute the script using the cached results, useful to continue executions that was stopped by an error",
+          args: {
+            name: "session ID",
+            isOptional: true,
+            generators: sessionid,
+          },
         },
         {
           name: ["-r", "-revision"],

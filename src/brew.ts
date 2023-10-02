@@ -67,6 +67,19 @@ const generateAllCasks: Fig.Generator = {
     }));
   },
 };
+const generateAliases: Fig.Generator = {
+  script: 'find ~/.brew-aliases/ -type f ! -name "*.*" -d 1 | sed "s/.*\\///"',
+  postProcess: function (out) {
+    return out
+      .split("\n")
+      .filter((line) => line && line.trim() !== "")
+      .map((line) => ({
+        name: line,
+        icon: "fig://icon?type=command",
+        description: `Execute alias ${line}`,
+      }));
+  },
+};
 
 const commonOptions: Fig.Option[] = [
   {
@@ -165,7 +178,7 @@ const completionSpec: Fig.Spec = {
       options: [
         ...commonOptions,
         {
-          name: "--formula,",
+          name: "--formula",
           description:
             "List only formulae, or treat all named arguments as formulae",
         },
@@ -765,7 +778,7 @@ const completionSpec: Fig.Spec = {
       options: [
         ...commonOptions,
         {
-          name: "--formula,",
+          name: "--formula",
           description: "Search online and locally for formulae",
         },
         {
@@ -864,7 +877,7 @@ const completionSpec: Fig.Spec = {
         },
         { name: ["-h", "--help"], description: "Show this message" },
         {
-          name: "--formula,",
+          name: "--formula",
           description: "Treat all named arguments as formulae",
         },
         {
@@ -1129,7 +1142,7 @@ const completionSpec: Fig.Spec = {
         },
         { name: ["-g", "--git"], description: "Create a Git repository" },
         {
-          name: "--formula,",
+          name: "--formula",
           description: "Treat all named arguments as formulae",
         },
         {
@@ -1199,6 +1212,28 @@ const completionSpec: Fig.Spec = {
       },
     },
     {
+      // NOTE: this is actually a command even if it has the double dash in the front
+      name: "--prefix",
+      description: "Prefix of <formula>",
+      args: {
+        isVariadic: true,
+        name: "formula",
+        generators: formulaeGenerator,
+      },
+      options: [
+        {
+          name: "--unbrewed",
+          description:
+            "List files in Homebrew's prefix not installed by Homebrew",
+        },
+        {
+          name: "--installed",
+          description:
+            "Outputs nothing and returns a failing status code if formula is not installed",
+        },
+      ],
+    },
+    {
       name: "cask",
       description:
         "Homebrew Cask provides a friendly CLI workflow for the administration of macOS applications distributed as binaries",
@@ -1227,7 +1262,7 @@ const completionSpec: Fig.Spec = {
                 "Don't fail uninstall, even if formula is a dependency of any installed formulae",
             },
             {
-              name: "--formula,",
+              name: "--formula",
               description: "Treat all named arguments as formulae",
             },
             {
@@ -1576,6 +1611,48 @@ const completionSpec: Fig.Spec = {
         },
       ],
     },
+    {
+      name: "alias",
+      description: "Manage custom user created brew aliases",
+      options: [
+        {
+          name: "--edit",
+          description: "Edit aliases in a text editor",
+        },
+        {
+          name: ["-d", "--debug"],
+          description: "Display any debugging information",
+        },
+        {
+          name: ["-q", "--quiet"],
+          description: "Make some output more quiet",
+        },
+        {
+          name: ["-v", "--verbose"],
+          description: "Make some output more verbose",
+        },
+        {
+          name: ["-h", "--help"],
+          description: "Show help message",
+        },
+      ],
+      args: {
+        name: "alias",
+        generators: generateAliases,
+        description: "Display the alias command",
+        isOptional: true,
+      },
+    },
+    {
+      name: "developer",
+      description: "Display the current state of Homebrew's developer mode",
+      args: {
+        name: "state",
+        description: "Turn Homebrew's developer mode on or off respectively",
+        suggestions: ["on", "off"],
+        isOptional: true,
+      },
+    },
   ],
   options: [
     {
@@ -1583,6 +1660,12 @@ const completionSpec: Fig.Spec = {
       description: "The current Homebrew version",
     },
   ],
+  args: {
+    name: "alias",
+    generators: generateAliases,
+    description: "Custom user defined brew alias",
+    isOptional: true,
+  },
 };
 
 export default completionSpec;
