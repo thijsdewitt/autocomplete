@@ -16,26 +16,25 @@ const completionSpec: Fig.Spec = {
   generateSpec: async (tokens, executeShellCommand) => {
     const subcommands = [];
 
-    await Promise.all([
-      async () => {
-        if (await fileExists(executeShellCommand, "artisan")) {
-          subcommands.push({ name: "artisan", loadSpec: "php/artisan" });
-        }
-      },
-      async () => {
-        if (await fileExists(executeShellCommand, "please")) {
-          subcommands.push({ name: "please", loadSpec: "php/please" });
-        }
-      },
-      async () => {
-        if (await fileExists(executeShellCommand, "bin/console")) {
-          subcommands.push({
-            name: "bin/console",
-            loadSpec: "php/bin-console",
-          });
-        }
-      },
-    ]);
+    if (await fileExists(executeShellCommand, "artisan")) {
+      subcommands.push({ name: "artisan", loadSpec: "php/artisan" });
+    }
+    if (await fileExists(executeShellCommand, "please")) {
+      subcommands.push({ name: "please", loadSpec: "php/please" });
+    }
+    if (await fileExists(executeShellCommand, "bin/console")) {
+      subcommands.push({
+        name: "bin/console",
+        loadSpec: "php/bin-console",
+      });
+    }
+    if (await fileExists(executeShellCommand, "bin/magento")) {
+      subcommands.push({
+        name: "bin/magento",
+        icon: "https://www.svgrepo.com/download/303592/magento-2-logo.svg",
+        loadSpec: "php/bin-magento",
+      });
+    }
 
     return {
       name: "php",

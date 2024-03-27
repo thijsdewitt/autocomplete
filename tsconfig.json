@@ -10,6 +10,7 @@
     "jsx": "react-jsx",
     "moduleResolution": "node",
     "outDir": "./build",
+    "sourceMap": true,
     "target": "ES6",
     "module": "ESNext",
     "lib": ["ESNext", "DOM"],
